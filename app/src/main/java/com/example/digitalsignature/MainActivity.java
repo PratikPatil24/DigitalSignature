@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
+import android.media.Image;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -39,17 +41,19 @@ public class MainActivity extends AppCompatActivity {
     View view;
     signature mSignature;
     Bitmap bitmap;
+    ImageView image;
 
     // Creating Separate Directory for saving Generated Images
-    String DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/DigitSign/";
-    String pic_name = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-    String StoredPath = DIRECTORY + pic_name + ".png";
+    //String DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/DigitSign/";
+    //String pic_name = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+    //String StoredPath = DIRECTORY + pic_name + ".png";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        image = (ImageView) findViewById(R.id.signatureImage);
         // Setting ToolBar as ActionBar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -58,10 +62,10 @@ public class MainActivity extends AppCompatActivity {
         btn_get_sign = (Button) findViewById(R.id.signature);
 
         // Method to create Directory, if the Directory doesn't exists
-        file = new File(DIRECTORY);
+        /*file = new File(DIRECTORY);
         if (!file.exists()) {
             file.mkdir();
-        }
+        }*/
 
         // Dialog Function
         dialog = new Dialog(MainActivity.this);
@@ -107,13 +111,15 @@ public class MainActivity extends AppCompatActivity {
 
             public void onClick(View v) {
 
+                Bitmap b;
                 Log.v("log_tag", "Panel Saved");
                 view.setDrawingCacheEnabled(true);
-                mSignature.save(view, StoredPath);
+                b = mSignature.save(view);
+                image.setImageBitmap(b);
                 dialog.dismiss();
-                Toast.makeText(getApplicationContext(), "Successfully Saved", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), "Successfully Saved", Toast.LENGTH_SHORT).show();
                 // Calling the same class
-                recreate();
+                //recreate();
 
             }
         });
@@ -149,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
             paint.setStrokeWidth(STROKE_WIDTH);
         }
 
-        public void save(View v, String StoredPath) {
+        public Bitmap save(View v) {
             Log.v("log_tag", "Width: " + v.getWidth());
             Log.v("log_tag", "Height: " + v.getHeight());
             if (bitmap == null) {
@@ -158,17 +164,18 @@ public class MainActivity extends AppCompatActivity {
             Canvas canvas = new Canvas(bitmap);
             try {
                 // Output the file
-                FileOutputStream mFileOutStream = new FileOutputStream(StoredPath);
+                //FileOutputStream mFileOutStream = new FileOutputStream(StoredPath);
                 v.draw(canvas);
-
+                Toast.makeText(MainActivity.this, "Passing Image", Toast.LENGTH_LONG).show();
                 // Convert the output file to Image such as .png
-                bitmap.compress(Bitmap.CompressFormat.PNG, 90, mFileOutStream);
-                mFileOutStream.flush();
-                mFileOutStream.close();
+                //bitmap.compress(Bitmap.CompressFormat.PNG, 90, mFileOutStream);
+                // mFileOutStream.flush();
+                //mFileOutStream.close();
 
             } catch (Exception e) {
                 Log.v("log_tag", e.toString());
             }
+            return bitmap;
 
         }
 
